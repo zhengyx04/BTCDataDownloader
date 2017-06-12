@@ -31,7 +31,7 @@ class BitfinexUSD(Market):
         return [depth[0]]
 
     def format_depth(self,depth):
-        return {'asks':self.get_latest_depth(depth['asks']),'bids':self.get_latest_depth(depth['bids'])}
+        return {'date':datetime.datetime.now().date(),'lu':datetime.datetime.utcnow(),'asks':self.get_latest_depth(depth['asks']),'bids':self.get_latest_depth(depth['bids'])}
 
     @staticmethod
     def create():

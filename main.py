@@ -6,11 +6,13 @@ import inspect
 import config
 import threading
 import datetime
+import DataBase
 
 class MarketDataLoader(object):
-    def __init__(self):
+    def __init__(self,db):
         self.inject_verbose_info()
         self.is_terminate=False
+        self.db=db
 
     def inject_verbose_info(self):
         logging.VERBOSE = 15
@@ -103,11 +105,18 @@ class MarketDataLoader(object):
         self.__save_depth_info()
 
     def __save_depth_info(self):
-        pass
+        if not self.is_terminate:
+            threading.Timer(config.refresh_rate,self.__save_depth_info).start()
+        print('fetching data at: ', datetime.datetime.now())
+        for market in self.markets:
+            depth=market.get_ticker()
+            self.db.insert(market.name, depth)
+            print('save data from ', market.name, end='')
+            print(depth)
 
 if __name__=='__main__':
-    marketDownload = MarketDataLoader()
+    db=DataBase.MongoDB('localhost',8001)
+    marketDownload = MarketDataLoader(db)
     #marketDownload.main()
-    marketDownload.dispaly_depth_info(['BitfinexUSD','BitstampUSD'])
-
-
+    #marketDownload.dispaly_depth_info(['BitfinexUSD','BitstampUSD'])
+    marketDownload.save_depth_info(['BitfinexUSD', 'BitstampUSD'])
