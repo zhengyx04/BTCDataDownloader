@@ -19,9 +19,9 @@ markets = [
 # ["Logger", "DetailedLogger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer", "SpecializedTraderBot"]
 observers = ["DetailedLogger", "TraderBotSim"]
 
-market_expiration_time = 120  # in seconds: 2 minutes
+market_expiration_time = 10*60  # in seconds: 2 minutes
 
-refresh_rate = 20
+refresh_rate = 5
 
 trade_wait = 10
 

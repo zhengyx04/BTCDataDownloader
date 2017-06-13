@@ -5,8 +5,12 @@ class MongoDB(object):
         self.client=pymongo.MongoClient(host,port)
         self.db=self.client.BTCMarketDepth
 
-    def insert(self,market,document):#each market will be a collection
-        self.db[market].insert_one(document)
+    def insert(self,market,documents):#each market will be a collection
+        if type(documents)==list:
+            for d in documents:
+                self.db[market].insert_one(d)
+        else:
+            self.db[market].insert_one(documents)
 
     def update(self,market, document):
         _id=document['_id']

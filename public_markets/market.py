@@ -17,7 +17,7 @@ class Market(object):
         self.name = self.__class__.__name__
         self.currency = currency
         self.depth_updated = 0
-        self.update_rate = 10
+        self.update_rate = 1
         self.fc = FiatConverter()
         self.fc.update()
         self.is_terminated = False
@@ -37,6 +37,7 @@ class Market(object):
             self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
                 {'price': 0, 'amount': 0}]}
         return self.depth
+
 
     def convert_to_cny(self):
         if self.currency == "CNY":
@@ -126,6 +127,10 @@ class Market(object):
     @staticmethod
     def get_market(name):
         return Market.registered_market[name]()
+
+    @staticmethod
+    def get_market_list():
+        return Market.registered_market.keys()
 
     @staticmethod
     def register_market(class_name):
