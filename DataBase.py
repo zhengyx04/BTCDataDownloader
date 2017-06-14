@@ -7,8 +7,7 @@ class MongoDB(object):
 
     def insert(self,market,documents):#each market will be a collection
         if type(documents)==list:
-            for d in documents:
-                self.db[market].insert_one(d)
+            self.db[market].insert_many(documents)
         else:
             self.db[market].insert_one(documents)
 

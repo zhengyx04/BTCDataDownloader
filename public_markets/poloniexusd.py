@@ -14,7 +14,7 @@ def createTimeStamp(datestr, format="%Y-%m-%d %H:%M:%S"):
 
 class PoloniexUSD(Market):
     def __init__(self, APIKey=None, Secret=None):
-        super().__init__("USD")
+        super().__init__()
         self.update_rate = 20
         self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
             {'price': 0, 'amount': 0}]}

@@ -9,7 +9,7 @@ from .market import Market
 
 class BitstampUSD(Market):
     def __init__(self):
-        super(BitstampUSD, self).__init__("USD")
+        super(BitstampUSD, self).__init__()
         self.update_rate = 20
 
     def update_depth(self):

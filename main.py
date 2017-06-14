@@ -101,12 +101,12 @@ class MarketDataLoader(object):
         return [public_markets.Market.get_market(e) for e in markets]
 
     def save_depth_info(self,markets):
-        if not self.is_terminate:
-            threading.Timer(config.refresh_rate, lambda :self.save_depth_info(markets)).start()
         self.markets=self.init_markets(markets)
         self.__save_depth_info()
 
     def __save_depth_info(self):
+        if not self.is_terminate:
+            threading.Timer(config.refresh_rate,self.__save_depth_info).start()
         print('fetching data at: ', datetime.datetime.now())
         for market in self.markets:
             depth=market.get_depth()
@@ -118,6 +118,10 @@ if __name__=='__main__':
     db=DataBase.MongoDB('localhost',8001)
     marketDownload=MarketDataLoader(db)
     #marketDownload.dispaly_depth_info(['PoloniexUSD'])
-    marketDownload.save_depth_info(['PoloniexUSD'])
+    marketDownload.save_depth_info(['Coinone'])
     #mkt=public_markets.Market.get_market('PoloniexUSD')
     #mkt.get_depth()
+
+if __name__=='__main__2':
+    mkt=public_markets.Market.get_market('Bithumb')
+    mkt.update_depth()
