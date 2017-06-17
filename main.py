@@ -118,10 +118,10 @@ if __name__=='__main__':
     db=DataBase.MongoDB('localhost',8001)
     marketDownload=MarketDataLoader(db)
     #marketDownload.dispaly_depth_info(['PoloniexUSD'])
-    marketDownload.save_depth_info(['Coinone'])
+    marketDownload.save_depth_info(['BitmexFuture'])
     #mkt=public_markets.Market.get_market('PoloniexUSD')
     #mkt.get_depth()
 
 if __name__=='__main__2':
-    mkt=public_markets.Market.get_market('Bithumb')
+    mkt=public_markets.Market.get_market('BitmexFuture')
     mkt.update_depth()

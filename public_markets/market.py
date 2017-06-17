@@ -4,12 +4,37 @@ import urllib.error
 import urllib.parse
 import config
 import logging
-from fiatconverter import FiatConverter
 from utils import log_exception
 import traceback
 import config
 import threading
 import datetime
+
+class Broker(object):
+    def __init__(self):
+        self.name = self.__class__.__name__
+        self.apikey = None
+        self.secret = None
+
+    def get_balance(self):
+        pass
+
+    def sell_order(self,currency_pair,price,qty, order_type):
+        pass
+
+    def buy_order(self,currency_pair,price,qty, order_type):
+        pass
+
+    def cancel_order(self,order_id):
+        pass
+
+    def get_open_orders(self):
+        pass
+
+    def with_draw(self,currency, qty, address):
+        pass
+
+
 
 class Market(object):
     registered_market={}
@@ -17,8 +42,6 @@ class Market(object):
         self.name = self.__class__.__name__
         self.depth_updated = 0
         self.update_rate = 1
-        self.fc = FiatConverter()
-        self.fc.update()
         self.is_terminated = False
 
     def terminate(self):
