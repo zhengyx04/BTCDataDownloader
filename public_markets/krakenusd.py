@@ -9,30 +9,41 @@ from .market import Market
 
 class KrakenUSD(Market):
     def __init__(self):
-        super().__init__("USD")
+        super().__init__()
         self.update_rate = 20
         self.depth = {}
 
+    def get_orderBook_by_prod(self,prod):
+        url = 'https://api.kraken.com/0/public/Depth?pair='
+        res = urllib.request.urlopen(url+prod+'&count=20').read().decode('utf8')
+        return json.loads(res)
+
+    def get_orderBook(self,prodList=['XXBTZUSD']):
+        return [self.get_orderBook_by_prod(e) for e in prodList]
+
     def update_depth(self):
-        res = urllib.request.urlopen(
-            'https://api.kraken.com/0/public/Depth?pair=XXBTZUSD&count=1')
-        jsonstr = res.read().decode('utf8')
         try:
-            depth = json.loads(jsonstr)
+            depth = self.get_orderBook()
         except Exception:
             logging.error("%s - Can't parse json: %s" % (self.name, jsonstr))
-        self.depth = self.format_depth(depth)
-
-    def get_latest_depth(self,depth):
-        for x in depth:
-            x['datetime']=datetime.datetime.utcfromtimestamp(int(float(x['timestamp'])))
-        depth.sort(key=lambda x:x['datetime'],reverse=True)
-        return [depth[0]]
+        self.depth = [self.format_depth(e) for e in depth]
 
     def format_depth(self,depth):
-        return {'date':datetime.datetime.now().date(),'lu':datetime.datetime.utcnow(),\
-          'asks':depth['result']['XXBTZUSD']['asks'][0],\
-          'bids':depth['result']['XXBTZUSD']['bids'][0]}
+        prod = list((depth['result']).keys())[0]
+        xt=datetime.datetime.utcfromtimestamp(float(depth['result'][prod]['asks'][0][2]))
+        lu=datetime.datetime.utcnow()
+        date=datetime.datetime.now().strftime('%Y.%m.%d')
+        qv=True        
+        pccy = prod[-3:]
+        occy = prod[2:5]
+        _id=self.gen_id(lu,occy+'_'+pccy)
+        return {'_id':_id,'date':date,'xt':xt,'lu':lu,'qv':qv,'occy':occy,'pccy':pccy,\
+                'asks':self.__format_bidasks(depth['result'][prod]['asks']),\
+                'bids':self.__format_bidasks(depth['result'][prod]['bids'])}
+
+    def __format_bidasks(self,bidask):
+        return [{'price':float(e[0]),'size':float(e[1])} for e in bidask]
+
 
     @staticmethod
     def create():
