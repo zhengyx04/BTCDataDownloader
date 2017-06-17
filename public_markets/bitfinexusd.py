@@ -9,7 +9,7 @@ from .market import Market
 
 class BitfinexUSD(Market):
     def __init__(self):
-        super().__init__("USD")
+        super().__init__()
         self.update_rate = 20
         self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
             {'price': 0, 'amount': 0}]}

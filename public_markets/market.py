@@ -13,11 +13,10 @@ import datetime
 
 class Market(object):
     registered_market={}
-    def __init__(self, currency):
+    def __init__(self):
         self.name = self.__class__.__name__
-        self.currency = currency
         self.depth_updated = 0
-        self.update_rate = 10
+        self.update_rate = 1
         self.fc = FiatConverter()
         self.fc.update()
         self.is_terminated = False
@@ -37,6 +36,10 @@ class Market(object):
             self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
                 {'price': 0, 'amount': 0}]}
         return self.depth
+
+    def gen_id(self,lu,currency_pair):
+        return hex(int(lu.timestamp()*1e6))+currency_pair
+
 
     def convert_to_cny(self):
         if self.currency == "CNY":
@@ -126,6 +129,10 @@ class Market(object):
     @staticmethod
     def get_market(name):
         return Market.registered_market[name]()
+
+    @staticmethod
+    def get_market_list():
+        return Market.registered_market.keys()
 
     @staticmethod
     def register_market(class_name):

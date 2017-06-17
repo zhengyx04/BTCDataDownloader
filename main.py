@@ -93,7 +93,7 @@ class MarketDataLoader(object):
             threading.Timer(config.refresh_rate,self.__display_depth_info).start()
         print('Get data at: ',datetime.datetime.utcnow())
         for market in self.markets:
-            depth=market.get_ticker()
+            depth=market.get_depth()
             print('get data from ', market.name, end='')
             print(depth)
 
@@ -109,14 +109,21 @@ class MarketDataLoader(object):
             threading.Timer(config.refresh_rate,self.__save_depth_info).start()
         print('fetching data at: ', datetime.datetime.now())
         for market in self.markets:
-            depth=market.get_ticker()
+            depth=market.get_depth()
             self.db.insert(market.name, depth)
             print('save data from ', market.name, end='')
             print(depth)
 
 if __name__=='__main__':
     db=DataBase.MongoDB('localhost',8001)
-    marketDownload = MarketDataLoader(db)
-    #marketDownload.main()
-    #marketDownload.dispaly_depth_info(['BitfinexUSD','BitstampUSD'])
-    marketDownload.save_depth_info(['BitfinexUSD', 'BitstampUSD', 'KrakenUSD'])
+
+    marketDownload=MarketDataLoader(db)
+    #marketDownload.dispaly_depth_info(['PoloniexUSD'])
+    marketDownload.save_depth_info(['Coinone'])
+    #mkt=public_markets.Market.get_market('PoloniexUSD')
+    #mkt.get_depth()
+
+if __name__=='__main__2':
+    mkt=public_markets.Market.get_market('Bithumb')
+    mkt.update_depth()
+
