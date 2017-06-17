@@ -119,4 +119,4 @@ if __name__=='__main__':
     marketDownload = MarketDataLoader(db)
     #marketDownload.main()
     #marketDownload.dispaly_depth_info(['BitfinexUSD','BitstampUSD'])
-    marketDownload.save_depth_info(['BitfinexUSD', 'BitstampUSD'])
+    marketDownload.save_depth_info(['BitfinexUSD', 'BitstampUSD', 'KrakenUSD'])
