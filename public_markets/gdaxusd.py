@@ -10,7 +10,7 @@ from .market import Market
 class GDAXUSD(Market):
     def __init__(self):
         super().__init__()
-        self.update_rate = 20
+        self.update_rate = 1
         self.depth = {}
 
     def get_orderBook_by_prod(self,prod):
