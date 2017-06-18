@@ -7,6 +7,7 @@ import config
 import threading
 import datetime
 import DataBase
+import sys
 
 class MarketDataLoader(object):
     def __init__(self,db):
@@ -32,13 +33,13 @@ class MarketDataLoader(object):
                         if inspect.isclass(obj) and 'Market' in (j.__name__ for j in obj.mro()[1:]):
                             if not obj.__module__.split('.')[-1].startswith('_'):
                                 print(obj.__name__)
-        sys.exit(0)
+        #sys.exit(0)
 
     @staticmethod
     def list_public_market():
         for market in public_markets.Market.registered_market:
             print(market)
-        sys.exit(0)
+        #sys.exit(0)
 
     def init_logger(self, args):
         level = logging.INFO
@@ -83,7 +84,7 @@ class MarketDataLoader(object):
         if "save-depth-info" in args.command:
             self.save_depth_info(args.markets)
 
-    def dispaly_depth_info(self,markets):
+    def display_depth_info(self,markets):
         self.markets=self.init_markets(markets)
         self.__display_depth_info()
 
@@ -112,18 +113,26 @@ class MarketDataLoader(object):
             depth=market.get_depth()
             self.db.insert(market.name, depth)
             print('save data from ', market.name, end='')
-            print(depth)
+            #print(depth)
 
 if __name__=='__main__':
-    db=DataBase.MongoDB('localhost',8001)
+    if len(sys.argv) > 1: 
+        mkt = sys.argv[1]
+    else:
+        mkt = 'BitfinexUSD'
 
+    db=DataBase.MongoDB('localhost',8001)
     marketDownload=MarketDataLoader(db)
     #marketDownload.dispaly_depth_info(['PoloniexUSD'])
-    marketDownload.save_depth_info(['Coinone'])
+    #marketDownload.save_depth_info(['Coinone'])
     #mkt=public_markets.Market.get_market('PoloniexUSD')
+    marketDownload.save_depth_info([mkt])
     #mkt.get_depth()
 
 if __name__=='__main__2':
-    mkt=public_markets.Market.get_market('Bithumb')
-    mkt.update_depth()
+    db = DataBase.MongoDB('localhost', 8001)
+    mkt=public_markets.Market.get_market('BitfinexUSD')
+    #mkt.update_depth()
+    dpth = mkt.get_depth()
+    db.insert(mkt.name,dpth)
 
