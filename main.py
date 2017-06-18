@@ -110,15 +110,16 @@ class MarketDataLoader(object):
         print('fetching data at: ', datetime.datetime.now())
         for market in self.markets:
             depth=market.get_depth()
-            self.db.insert(market.name, depth)
-            print('save data from ', market.name, end='')
-            print(depth)
+            if market.update_success:
+               # self.db.insert(market.name, depth)
+                print('save data from ', market.name, end='')
+                print(depth)
 
 if __name__=='__main__':
     db=DataBase.MongoDB('localhost',8001)
     marketDownload=MarketDataLoader(db)
     #marketDownload.dispaly_depth_info(['PoloniexUSD'])
-    marketDownload.save_depth_info(['BitmexFuture'])
+    marketDownload.save_depth_info(['GDAX'])
     #mkt=public_markets.Market.get_market('PoloniexUSD')
     #mkt.get_depth()
 

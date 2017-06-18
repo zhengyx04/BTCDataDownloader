@@ -10,8 +10,8 @@ from .market import Market
 class Coinone(Market):
     def __init__(self):
       super().__init__()
-      self.ACCESS_TOKEN = ''
-      self.SECRET_KEY = ''
+      self.AIPKey = self.get_config('APIKey')
+      self.Secret = self.get_config('Secret')
       self.urlapi = 'https://api.coinone.co.kr'
 
     def get_encoded_payload(self,payload):
@@ -37,34 +37,22 @@ class Coinone(Market):
         })
       return json.loads(response.read().decode('utf8'))
 
-    def get_order_book_ccy(self,occy):
+    def get_exchange_depth(self,ticker):
         #occy can only be one of btc, eth, etc, xrp
         url = '/orderbook/?currency='
-        res=urllib.request.urlopen(self.urlapi+url+occy).read().decode('utf8')
-        return json.loads(res)
+        res=urllib.request.urlopen(self.urlapi+url+ticker).read().decode('utf8')
+        res=json.loads(res)
+        return self.depth_transform(res)
 
-    def get_order_book(self):
-        occy_list=['btc','eth','etc','xrp']
-        return [self.get_order_book_ccy(e) for e in occy_list]
+    def get_currency_pair(self,ticker):
+        return ticker, 'KRW'
 
-    def update_depth(self):
-        depth=self.get_order_book()
-        self.depth=[self.format_depth(e) for e in depth]
-
-    def format_depth(self, depth):
+    def depth_transform(self, depth):
         xt=datetime.datetime.utcfromtimestamp(float(depth['timestamp']))
-        lu=datetime.datetime.utcnow()
-        date=datetime.datetime.now().strftime('%Y.%m.%d')
-        qv=True
-        occy=depth['currency'].upper()
-        pccy='KRW'
-        _id=self.gen_id(lu,occy+'_'+pccy)
-        return {'_id':_id,'date':date,'xt':xt,'lu':lu,'qv':qv,'occy':occy,'pccy':pccy,\
-                'asks':self.__format_bidasks(depth['ask']),\
-                'bids':self.__format_bidasks(depth['bid'])}
-
-    def __format_bidasks(self,bidask):
-        return [{'price':float(e['price']),'size':float(e['qty'])} for e in bidask]
+        res={'xt':xt}
+        res['asks']=[{'price':e['price'],'size':e['qty']} for e in depth['ask']]
+        res['bids'] = [{'price': e['price'], 'size': e['qty']} for e in depth['bid']]
+        return res
 
     @staticmethod
     def create():
