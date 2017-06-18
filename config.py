@@ -1,3 +1,24 @@
+from public_markets import prodList
+
+market_expiration_time = 10*60  # in seconds: 2 minutes
+refresh_rate = 5
+
+market_parameters={'DefaultMarket':{'APIKey':None,'Secret':None,'UpdateRate':1},\
+                    'TemplateMarket':{'TickerList':['ticker1name','ticker2name']},
+                   'Poloniex':{'TickerList':'all'},\
+                   'Bithumb':{'TickerList':['btc_krw']},\
+                   'Bitstamp':{'TickerList':['btc_usd']},\
+                   'Coinone':{'TickerList':['btc','eth','etc','xrp']},\
+                    'GDAX':{'TickerList':prodList.get_prodList('GDAX')},\
+                    'Kraken':{'TickerList':prodList.get_prodList('Kraken')}, \
+                    'Bitfinex': {'TickerList': prodList.get_prodList('Bitfinex')}}
+
+def get_market_config(market_name,attribution):
+    if attribution in market_parameters[market_name]:
+        return market_parameters[market_name][attribution]
+    else:
+        return market_parameters['DefaultMarket'][attribution]
+
 markets = [
 # "BitfinexUSD",
 # "BitstampUSD",
@@ -10,18 +31,12 @@ markets = [
 # "KrakenEUR",
 # "KrakenUSD",
 # "OKCoinCNY",
-"HaobtcCNY",
+#"HaobtcCNY",
 # "HuobiCNY",
 # "PaymiumEUR",
 ]
 
-# observers if any
-# ["Logger", "DetailedLogger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer", "SpecializedTraderBot"]
-observers = ["DetailedLogger", "TraderBotSim"]
 
-market_expiration_time = 10*60  # in seconds: 2 minutes
-
-refresh_rate = 5
 
 trade_wait = 10
 

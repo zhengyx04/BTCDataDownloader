@@ -4,17 +4,17 @@ import json
 def get_prodList(exchange):
 
     prodList = {}
-    prodList['GDAXUSD'] = ['BTC-GBP','BTC-USD','ETH-USD','LTC-USD','ETH-EUR','LTC-EUR','BTC-EUR','ETH-BTC','LTC-BTC']
+    prodList['GDAX'] = ['BTC-GBP','BTC-USD','ETH-USD','LTC-USD','ETH-EUR','LTC-EUR','BTC-EUR','ETH-BTC','LTC-BTC']
 
     res = urllib.request.urlopen('https://api.kraken.com/0/public/AssetPairs')
     jsonstr = res.read().decode('utf8')
     asset = json.loads(jsonstr)
-    prodList['KrakenUSD'] = list(asset['result'].keys())
+    prodList['Kraken'] = list(asset['result'].keys())
   
     res = urllib.request.urlopen('https://api.bitfinex.com/v1/symbols_details')
     jsonstr = res.read().decode('utf8')
     asset = json.loads(jsonstr)
-    prodList['BitfinexUSD'] = [e['pair'] for e in asset]
+    prodList['Bitfinex'] = [e['pair'] for e in asset]
   
     return prodList[exchange]
 

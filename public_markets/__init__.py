@@ -1,10 +1,11 @@
 from .market import Market
-from .bitfinexusd import *
-from .bitstampusd import *
-from .krakenusd import *
-from .gdaxusd import *
-from .poloniexusd import *
-#from .bithumb import *
+from .bitfinex import *
+from .bitstamp import *
+from .poloniex import *
+from .bithumb import *
 from .coinone import *
-
+from .bitmex import *
+from .gdax import *
+from .kraken import  *
+from .templateMarket import *
 #__all__=['market','bitstampusd','bitfinexusd']

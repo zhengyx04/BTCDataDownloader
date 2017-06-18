@@ -17,29 +17,27 @@ class Bithumb(Market):
     def __get_recent_ticker(self):
         return self.api.xcoinApiCall('/public/recent_ticker',self.rgParams)
 
-    def __get_orderbook(self):
-        return self.api.xcoinApiCall('/public/orderbook',self.rgParams)
+    def __get_orderbook(self,param):
+        return self.api.xcoinApiCall('/public/orderbook',param)
 
     def __get_recent_transaction(self):
         return self.api.xcoinApiCall('/public/recent_transactions', self.rgParams)
 
-    def update_depth(self):
-        depth=self.__get_orderbook()
-        self.depth=self.format_depth(depth)
+    def get_currency_pair(self,ticker):
+        return ticker.split('_')
 
-    def format_depth(self, depth):
-        xt=datetime.datetime.utcfromtimestamp(float(depth['data']['timestamp'])/1e3)
-        date=datetime.datetime.now().date().strftime('%Y.%m.%d')
-        lu=datetime.datetime.utcnow()
-        occy=depth['data']['order_currency'].upper()
-        pccy=depth['data']['payment_currency'].upper()
-        _id=self.gen_id(lu,occy+'_'+pccy)
-        return {'_id':_id,'date':date,'xt':xt,'lu':lu,'qv':True,'occy':occy,'pccy':pccy, \
-                'asks':self.__format_bidasks(depth['data']['asks']),\
-                'bids':self.__format_bidasks(depth['data']['bids'])}
+    def get_exchange_depth(self,ticker):
+        occy,pccy=self.get_currency_pair(ticker)
+        param={"order_currency" : occy.upper(), "payment_currency" : pccy.upper()}
+        depth=self.__get_orderbook(param)
+        return self.depth_transform(depth)
 
-    def __format_bidasks(self,bidask):
-        return [{'price':float(e['price']),'size':float(e['quantity'])} for e in bidask]
+
+    def depth_transform(self, depth):
+        res={'xt':datetime.datetime.utcfromtimestamp(float(depth['data']['timestamp'])/1e3)}
+        res['asks'] = [{'price':float(e['price']),'size':float(e['quantity'])} for e in depth['data']['asks']]
+        res['bids'] = [{'price':float(e['price']),'size':float(e['quantity'])} for e in depth['data']['bids']]
+        return res
 
     @staticmethod
     def create():

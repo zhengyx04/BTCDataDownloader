@@ -12,26 +12,24 @@ def createTimeStamp(datestr, format="%Y-%m-%d %H:%M:%S"):
     return time.mktime(time.strptime(datestr, format))
 
 
-class PoloniexUSD(Market):
+class Poloniex(Market):
     def __init__(self, APIKey=None, Secret=None):
         super().__init__()
-        self.update_rate = 20
-        self.depth = {'asks': [{'price': 0, 'amount': 0}], 'bids': [
-            {'price': 0, 'amount': 0}]}
-        self.APIKey = APIKey
-        self.Secret = Secret
+        self.init_config()
 
+    def init_config(self):
+        self.APIKey = self.get_config('APIKey')
+        self.Secret = self.get_config('Secret')
 
     def post_process(self, before):
         after = before
         # Add timestamps if there isnt one but is a datetime
         if ('return' in after):
             if (isinstance(after['return'], list)):
-                for x in xrange(0, len(after['return'])):
+                for x in range(0, len(after['return'])):
                     if (isinstance(after['return'][x], dict)):
                         if ('datetime' in after['return'][x] and 'timestamp' not in after['return'][x]):
                             after['return'][x]['timestamp'] = float(createTimeStamp(after['return'][x]['datetime']))
-
         return after
 
     def api_query(self, command, req={}):
@@ -148,29 +146,39 @@ class PoloniexUSD(Market):
         return self.api_query('withdraw', {"currency": currency, "amount": amount, "address": address})
 
     def update_depth(self):
-        depth=self.returnOrderBook('all')
-        self.depth=self.format_depth(depth)
+        if self.tickerlist=='all':
+            xt=datetime.datetime.utcnow()
+            depth=self.returnOrderBook('all')
+            self.depth=self.all_depth_transform(xt,depth)
+        else:
+            super().update_depth()
 
-    def format_depth(self,depth):
-        date = datetime.datetime.now().date().strftime('%Y.%m.%d')
-        lu =  datetime.datetime.utcnow()
-        id = str(hex(int(lu.timestamp()*1e6)))
-        def mkentry(key, value):
-            value['_id'] = id + key
-            value['sym'] = key
-            value['date'] = date
-            value['lu'] = lu
-            return value
-        ret=[mkentry(key,value) for key, value in depth.items()]
-        return ret
+    def all_depth_transform(self,xt,depth):
+        return [self.format_depth(self.depth_transform(xt,depth[key]),key) for key in depth]
+
+    def get_exchange_depth(self,ticker):
+        xt=datetime.datetime.utcnow()
+        depth=self.returnOrderBook(ticker)
+        return self.depth_transform(xt,depth)
+
+    def depth_transform(self,xt,depth):
+        res={'xt':xt}
+        res['asks']=[{'price':float(e[0]),'size':e[1]} for e in depth['asks']]
+        res['bids'] = [{'price': float(e[0]), 'size': e[1]} for e in depth['bids']]
+        res['seq'] = depth['seq']
+        return res
+
+    def get_currency_pair(self,ticker):
+        return ticker.split('_')
+
 
     @staticmethod
     def create():
-        return PoloniexUSD()
+        return Poloniex()
 
-Market.register_market(PoloniexUSD)
+Market.register_market(Poloniex)
 
 if __name__ == "__main__":
-    market = Market.get_market('PoloniexUSD')
+    market = Market.get_market('Poloniex')
     print(market.get_ticker())
 
