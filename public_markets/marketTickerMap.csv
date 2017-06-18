@@ -1,0 +1,4 @@
+market,ticker,occy,pccy
+Poloniex,LTC_BTC,LTC,BTC
+Poloniex,ETH_BTC,ETH,BTC
+Poloniex,BTC_USDT,BTC,USD

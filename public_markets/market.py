@@ -83,7 +83,7 @@ class Market(object):
             traceback.print_exc()
 
     def update_depth(self):
-        self.depth = [self.update_depth_core(ticker) for ticker in self.tickerlist]
+        self.depth = [self.update_depth_core(ticker) for ticker in self.tickerlist.keys()]
 
     def update_depth_core(self, ticker):
         """
@@ -101,7 +101,7 @@ class Market(object):
         depth['date'] = datetime.datetime.now().date().strftime('%Y.%m.%d')
         depth['lu'] = datetime.datetime.utcnow()
         depth['_id'] = self.gen_id(depth['lu'], ticker)
-        occy,pccy = self.get_currency_pair(ticker)
+        occy,pccy = self.get_currency_pair2(ticker)
         depth['pccy'] = pccy
         depth['occy'] = occy
         depth['sym'] = ticker
@@ -109,6 +109,9 @@ class Market(object):
         depth['bids'] = sorted(depth['bids'], key=lambda x: x['price'], reverse=True)
         return depth
 
+    def get_currency_pair2(self,ticker):
+        return self.tickerlist[ticker]['occy'],self.tickerlist[ticker]['pccy']
+    
     ## Abstract methods
     def get_currency_pair(self,ticker):
         pass

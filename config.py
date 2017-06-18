@@ -1,17 +1,23 @@
 from public_markets import prodList
+import pandas
+
+tickermap = pandas.read_csv('./public_markets/marketTickerMap.csv')
+
+def get_tickerlist_map(market):
+    return {e.ticker:{'pccy':e['pccy'],'occy':e['occy']} for n,e in tickermap[tickermap.market==market].iterrows()}
 
 market_expiration_time = 10*60  # in seconds: 2 minutes
 refresh_rate = 5
 
 market_parameters={'DefaultMarket':{'APIKey':None,'Secret':None,'UpdateRate':1},\
                     'TemplateMarket':{'TickerList':['ticker1name','ticker2name']},
-                   'Poloniex':{'TickerList':'all'},\
-                   'Bithumb':{'TickerList':['btc_krw']},\
-                   'Bitstamp':{'TickerList':['btc_usd']},\
-                   'Coinone':{'TickerList':['btc','eth','etc','xrp']},\
-                    'GDAX':{'TickerList':prodList.get_prodList('GDAX')},\
-                    'Kraken':{'TickerList':prodList.get_prodList('Kraken')}, \
-                    'Bitfinex': {'TickerList': prodList.get_prodList('Bitfinex')}}
+                   'Poloniex':{'TickerList':get_tickerlist_map('Poloniex')},\
+                   'Bithumb':{'TickerList':get_tickerlist_map('Bithumb')},\
+                   'Bitstamp':{'TickerList':get_tickerlist_map('Bitstamp')},\
+                   'Coinone':{'TickerList':get_tickerlist_map('Coinone')},\
+                    'GDAX':{'TickerList':get_tickerlist_map('GDAX')},\
+                    'Kraken':{'TickerList':get_tickerlist_map('Kraken')}, \
+                    'Bitfinex': {'TickerList': get_tickerlist_map('Bitfinex')}}
 
 def get_market_config(market_name,attribution):
     if attribution in market_parameters[market_name]:
