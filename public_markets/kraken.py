@@ -10,15 +10,12 @@ from .market import Market
 class Kraken(Market):
     def __init__(self):
         super().__init__()
+        self.get_api_url_orderbook = 'https://api.kraken.com/0/public/Depth?pair={ticker:s}'
 
     def get_orderBook_by_prod(self,prod):
-        url = 'https://api.kraken.com/0/public/Depth?pair='
-        res = urllib.request.urlopen(url+prod+'&count=1').read().decode('utf8')
+        url=self.get_api_url_orderbook.format(ticker=prod)
+        res = urllib.request.urlopen(url).read().decode('utf8')
         return json.loads(res)
-
-    def get_currency_pair(self,ticker):
-        ticker=ticker.split('.')[0]
-        return ticker[0:-3],ticker[-3:]
 
     def get_exchange_depth(self,ticker):
         depth=self.get_orderBook_by_prod(ticker)

@@ -13,6 +13,7 @@ class Coinone(Market):
       self.AIPKey = self.get_config('APIKey')
       self.Secret = self.get_config('Secret')
       self.urlapi = 'https://api.coinone.co.kr'
+      self.get_api_url_orderbook='https://api.coinone.co.kr/orderbook/?currency={ticker:s}'
 
     def get_encoded_payload(self,payload):
       #add nonce
@@ -39,13 +40,10 @@ class Coinone(Market):
 
     def get_exchange_depth(self,ticker):
         #occy can only be one of btc, eth, etc, xrp
-        url = '/orderbook/?currency='
-        res=urllib.request.urlopen(self.urlapi+url+ticker).read().decode('utf8')
+        url = self.get_api_url_orderbook.format(ticker=ticker)
+        res=urllib.request.urlopen(url).read().decode('utf8')
         res=json.loads(res)
         return self.depth_transform(res)
-
-    def get_currency_pair(self,ticker):
-        return ticker, 'KRW'
 
     def depth_transform(self, depth):
         xt=datetime.datetime.utcfromtimestamp(float(depth['timestamp']))

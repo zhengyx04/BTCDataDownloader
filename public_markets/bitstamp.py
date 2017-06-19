@@ -10,9 +10,10 @@ from .market import Market
 class Bitstamp(Market):
     def __init__(self):
         super().__init__()
+        self.get_api_url='https://www.bitstamp.net/api/v2/order_book/{ticker:s}/'
 
     def __get_order_book(self,ticker):
-        url = 'https://www.bitstamp.net/api/order_book/'
+        url=self.get_api_url.format(ticker=ticker)
         req = urllib.request.Request(url, None, headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "*/*",
@@ -20,9 +21,6 @@ class Bitstamp(Market):
         res = urllib.request.urlopen(req)
         depth = json.loads(res.read().decode('utf8'))
         return depth
-
-    def get_currency_pair(self,ticker):
-        return ticker.split('_')
 
     def get_exchange_depth(self,ticker):
         depth = self.__get_order_book(ticker)

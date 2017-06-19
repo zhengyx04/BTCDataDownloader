@@ -168,9 +168,6 @@ class Poloniex(Market):
         res['seq'] = depth['seq']
         return res
 
-    def get_currency_pair(self,ticker):
-        return ticker.split('_')
-
 
     @staticmethod
     def create():

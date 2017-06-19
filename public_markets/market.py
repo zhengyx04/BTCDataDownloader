@@ -52,7 +52,7 @@ class Market(object):
         self.tickerlist = self.get_config('TickerList')
 
     def get_depth(self):
-        self.update_success = False
+        self.update_success = True
         timediff = time.time() - self.depth_updated
         if timediff > self.update_rate:
             self.ask_update_depth()
@@ -69,21 +69,11 @@ class Market(object):
         return hex(int(lu.timestamp()*1e6))+ticker
 
     def ask_update_depth(self):
-        try:
-            self.update_depth()
-            self.depth_updated = time.time()
-            self.update_success = True
-        except (urllib.error.HTTPError, urllib.error.URLError) as e:
-            logging.error("HTTPError, can't update market: %s" % self.name)
-            traceback.print_exc()
-            log_exception(logging.DEBUG)
-        except Exception as e:
-            logging.error("Can't update market: %s - %s" % (self.name, str(e)))
-            log_exception(logging.DEBUG)
-            traceback.print_exc()
+        self.update_depth()
+        self.depth_updated = time.time()
 
     def update_depth(self):
-        self.depth = [self.update_depth_core(ticker) for ticker in self.tickerlist]
+        self.depth = [self.update_depth_core(ticker) for ticker in self.tickerlist.keys()]
 
     def update_depth_core(self, ticker):
         """
@@ -92,8 +82,16 @@ class Market(object):
         try:
             depth = self.get_exchange_depth(ticker)
             return self.format_depth(depth, ticker)
-        except:
-            logging.error('load data error for ticker: '+ticker)
+        except (urllib.error.HTTPError, urllib.error.URLError) as e:
+            logging.error("HTTPError, can't update market: %s for ticker: %s" % (self.name,ticker))
+            traceback.print_exc()
+            log_exception(logging.DEBUG)
+        except Exception as e:
+            logging.error("Can't update market: %s for ticker %s - %s" % (self.name, ticker, str(e)))
+            log_exception(logging.DEBUG)
+            traceback.print_exc()
+        self.update_success = False
+        return None
 
     def format_depth(self,depth,ticker):
         if not all(k in depth for k in ('xt', 'asks', 'bids')):
@@ -109,10 +107,10 @@ class Market(object):
         depth['bids'] = sorted(depth['bids'], key=lambda x: x['price'], reverse=True)
         return depth
 
-    ## Abstract methods
     def get_currency_pair(self,ticker):
-        pass
+        return [self.tickerlist[ticker]['occy'],self.tickerlist[ticker]['pccy']]
 
+    #abstract class
     def get_exchange_depth(self,ticker):
         return {}
 
