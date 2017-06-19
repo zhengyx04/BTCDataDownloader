@@ -10,16 +10,14 @@ from .market import Market
 class GDAX(Market):
     def __init__(self):
         super().__init__()
+        self.get_api_url_orderbook='https://api.gdax.com/products/{ticker:s}/book?level=2'
 
     def get_orderBook_by_prod(self,prod):
-        url = 'https://api.gdax.com/products/'
-        res = urllib.request.urlopen(url+prod+'/book?level=2').read().decode('utf8')
+        url = self.get_api_url_orderbook.format(ticker=prod)
+        res = urllib.request.urlopen(url).read().decode('utf8')
         depths = json.loads(res)
         depths = {'asks':depths['asks'][0:20], 'bids':depths['asks'][0:20], 'sequence':depths['sequence']}
         return depths
-
-    def get_currency_pair(self,ticker):
-        return ticker.split('-')
 
     def get_exchange_depth(self,ticker):
         xt=datetime.datetime.utcnow()

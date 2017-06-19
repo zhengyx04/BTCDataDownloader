@@ -23,9 +23,6 @@ class Bithumb(Market):
     def __get_recent_transaction(self):
         return self.api.xcoinApiCall('/public/recent_transactions', self.rgParams)
 
-    def get_currency_pair(self,ticker):
-        return ticker.split('_')
-
     def get_exchange_depth(self,ticker):
         occy,pccy=self.get_currency_pair(ticker)
         param={"order_currency" : occy.upper(), "payment_currency" : pccy.upper()}

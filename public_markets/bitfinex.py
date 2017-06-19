@@ -10,16 +10,12 @@ from .market import Market
 class Bitfinex(Market):
     def __init__(self):
         super().__init__()
-        self.update_rate = 1
-        self.depth = {}
+        self.get_api_url_orderbook='https://api.bitfinex.com/v1/book/{ticker:s}/?limit_bids=20&limit_asks=20'
 
     def get_orderBook_by_prod(self,prod):
-        url = 'https://api.bitfinex.com/v1/book/'
-        res = urllib.request.urlopen(url+prod+'?limit_bids=20&limit_asks=20').read().decode('utf8')
+        url=self.get_api_url_orderbook.format(ticker=prod)
+        res = urllib.request.urlopen(url).read().decode('utf8')
         return json.loads(res)
-
-    def get_currency_pair(self,ticker):
-        return ticker[0:-3],ticker[-3:]
 
     def get_exchange_depth(self,ticker):
         depth=self.get_orderBook_by_prod(ticker)
