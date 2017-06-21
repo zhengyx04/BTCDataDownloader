@@ -17,7 +17,9 @@ market_parameters={'DefaultMarket':{'APIKey':None,'Secret':None,'UpdateRate':1},
                    'Coinone':{'TickerList':get_tickerlist_map('Coinone')},\
                     'GDAX':{'TickerList':get_tickerlist_map('GDAX')},\
                     'Kraken':{'TickerList':get_tickerlist_map('Kraken')}, \
-                    'Bitfinex': {'TickerList': get_tickerlist_map('Bitfinex')}}
+                    'Bitfinex': {'TickerList': get_tickerlist_map('Bitfinex')},\
+                    'Huobi': {'TickerList': get_tickerlist_map('Huobi')},\
+                    'OKCoin': {'TickerList': get_tickerlist_map('OKCoin')}}
 
 def get_market_config(market_name,attribution):
     if attribution in market_parameters[market_name]:
