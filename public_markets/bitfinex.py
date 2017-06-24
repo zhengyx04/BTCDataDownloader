@@ -12,21 +12,24 @@ class Bitfinex(Market):
         super().__init__()
         self.get_api_url_orderbook='https://api.bitfinex.com/v1/book/{ticker:s}/?limit_bids=20&limit_asks=20'
 
-    def get_orderBook_by_prod(self,prod):
-        url=self.get_api_url_orderbook.format(ticker=prod)
-        res = urllib.request.urlopen(url).read().decode('utf8')
-        return json.loads(res)
-
     def get_exchange_depth(self,ticker):
-        depth=self.get_orderBook_by_prod(ticker)
-        return self.depth_transform(depth)
+        xt=datetime.datetime.utcnow()
+        url=self.get_api_url_orderbook.format(ticker=ticker)
+        res = urllib.request.urlopen(url).read().decode('utf8')
+        depth=json.loads(res)
+        return self.depth_transform(xt,depth)
 
-    def depth_transform(self,depth):
-        res={'xt':datetime.datetime.utcfromtimestamp(float(depth['asks'][0]['timestamp']))}
-        res['asks']=[ {'price':float(e['price']),'size':float(e['amount']),'timestamp':float(e['timestamp'])} for e in depth['asks']]
-        res['bids'] = [{'price': float(e['price']), 'size': float(e['amount']), 'timestamp':float(
-            e['timestamp'])} for e in depth['bids']]
-        return res
+    def depth_transform(self,xt,depth):
+        res = {'xt': xt, 'asks':[], 'bids':[]}
+        if len(depth['asks']) > 0:
+            res['xt'] = datetime.datetime.utcfromtimestamp(float(depth['asks'][0]['timestamp']))
+            res['asks']=[ {'price':float(e['price']),'size':float(e['amount']),\
+             'timestamp':float(e['timestamp'])} for e in depth['asks']]
+        if len(depth['bids']) > 0:
+            res['xt'] = datetime.datetime.utcfromtimestamp(float(depth['bids'][0]['timestamp']))
+            res['bids'] = [{'price': float(e['price']), 'size': float(e['amount']),\
+             'timestamp':float(e['timestamp'])} for e in depth['bids']]
+        return res if len(res['bids'])>0 or len(res['asks'])>0 else None
 
     @staticmethod
     def create():

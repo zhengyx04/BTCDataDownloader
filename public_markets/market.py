@@ -74,6 +74,11 @@ class Market(object):
 
     def update_depth(self):
         self.depth = [self.update_depth_core(ticker) for ticker in self.tickerlist.keys()]
+        self.depth = [e for e in self.depth if not e is None]
+        if len(self.depth)==0:
+            self.update_success = False
+        else:
+            self.update_success = self.update_success and True
 
     def update_depth_core(self, ticker):
         """
@@ -90,7 +95,6 @@ class Market(object):
             logging.error("Can't update market: %s for ticker %s - %s" % (self.name, ticker, str(e)))
             log_exception(logging.DEBUG)
             traceback.print_exc()
-        self.update_success = False
         return None
 
     def format_depth(self,depth,ticker):

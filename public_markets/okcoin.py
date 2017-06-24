@@ -13,21 +13,19 @@ class OKCoin(Market):
         #self.get_api_root_URL=''
 
     def get_exchange_depth(self,ticker):
-        """
-        :param ticker get order book from exchange and format the result
-        :return: {'xt','asks':[{'price0','size0'},{'price1','size1'}],'bids':[{'price0','size0'},{'price1','size1'}]}
-        """
+        xt=datetime.datetime.utcnow()
         url = 'https://www.okcoin.cn/api/v1/depth.do?symbol='+ticker+'&size=20'
         res = urllib.request.urlopen(url).read().decode('utf8')
-        res = json.loads(res)
-        depth = self.transform_depth(res)
-        return depth
+        depth = json.loads(res)
+        return self.transform_depth(xt,depth)
 
-    def transform_depth(self,depth):
-        res = {'xt':None}
-        res['asks'] = [{'price':float(e[0]), 'size':float(e[1]), 'timestamp':None} for e in depth['asks']]
-        res['bids'] = [{'price':float(e[0]), 'size':float(e[1]), 'timestamp':None} for e in depth['bids']]
-        return res
+    def transform_depth(self,xt,depth):
+        res = {'xt':xt, 'asks':[], 'bids':[]}
+        if len(depth['asks']) > 0:
+            res['asks'] = [{'price':float(e[0]), 'size':float(e[1]), 'timestamp':None} for e in depth['asks']]
+        if len(depth['bids']) > 0:
+            res['bids'] = [{'price':float(e[0]), 'size':float(e[1]), 'timestamp':None} for e in depth['bids']]
+        return res if len(res['bids'])>0 or len(res['asks'])>0 else None
 
     #def get_currency_pair(self,ticker):
     #    return 'pccy','occy'

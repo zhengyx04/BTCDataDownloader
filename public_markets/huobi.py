@@ -26,16 +26,17 @@ class Huobi(Market):
         else:
             url = ''
         res = urllib.request.urlopen(url).read().decode('utf8')            
-        res = json.loads(res)
-        depth = self.transform_depth(res)
-        return depth
+        depth = json.loads(res)
+        return self.transform_depth(depth)
 
     def transform_depth(self,depth):
         #print(float(depth['ts']))
-        res = {'xt':datetime.datetime.utcfromtimestamp(float(depth['ts'])/1000)}
-        res['asks'] = [{'price':float(e[0]), 'size':float(e[1]), 'timestamp':None} for e in depth['asks']]
-        res['bids'] = [{'price':float(e[0]), 'size':float(e[1]), 'timestamp':None} for e in depth['bids']]
-        return res
+        res = {'xt':datetime.datetime.utcfromtimestamp(float(depth['ts'])/1000), 'asks':[], 'bids':[]}
+        if len(depth['asks']) > 0:
+            res['asks'] = [{'price':float(e[0]), 'size':float(e[1]), 'timestamp':None} for e in depth['asks']]
+        if len(depth['bids']) > 0:
+            res['bids'] = [{'price':float(e[0]), 'size':float(e[1]), 'timestamp':None} for e in depth['bids']]
+        return res if len(res['bids'])>0 or len(res['asks'])>0 else None
 
     #def get_currency_pair(self,ticker):
     #    return 'pccy','occy'

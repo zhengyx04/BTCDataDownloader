@@ -18,15 +18,26 @@ class Kraken(Market):
         return json.loads(res)
 
     def get_exchange_depth(self,ticker):
+        xt=datetime.datetime.utcnow()
         depth=self.get_orderBook_by_prod(ticker)
-        depth=self.depth_transform(depth['result'][ticker])
+        depth=self.depth_transform(xt,depth['result'][ticker])
         return depth
 
-    def depth_transform(self,depth):
-        res={'xt':datetime.datetime.utcfromtimestamp(float(depth['asks'][0][2]))}
-        res['asks']=[{'price':float(e[0]),'size':float(e[1]),'timestamp':e[2]} for e in depth['asks']]
-        res['bids'] = [{'price':float(e[0]),'size':float(e[1]),'timestamp':e[2]} for e in depth['bids']]
-        return res
+    def depth_transform(self,xt,depth):
+        res={'xt':xt}
+        if len(depth['asks'])>0:
+            res['xt']=datetime.datetime.utcfromtimestamp(depth['asks'][0][2])
+            res['asks'] = [{'price': float(e[0]), 'size': float(e[1])} for e in depth['asks']]
+        else:
+            res['asks'] = []
+
+        if len(depth['bids'])>0:
+            res['xt']=datetime.datetime.utcfromtimestamp(depth['bids'][0][2])
+            res['bids'] = [{'price': float(e[0]), 'size': float(e[1])} for e in depth['bids']]
+        else:
+            res['bids'] = []
+
+        return res if len(res['bids'])>0 or len(res['asks'])>0 else None
 
     @staticmethod
     def create():
